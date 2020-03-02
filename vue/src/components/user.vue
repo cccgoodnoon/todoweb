@@ -1,155 +1,149 @@
 <template>
-    <el-container>
-        <el-header style="text-align: right; font-size: 12px">
-            <el-dropdown>
-                <i class="el-icon-setting" style="margin-right: 15px"></i>
-                <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>查看</el-dropdown-item>
-                    <el-dropdown-item>新增</el-dropdown-item>
-                    <el-dropdown-item>删除</el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
-            <span>王小虎</span>
-        </el-header>
+    <div id="user"> 
+        <h1>TODO</h1>
+        <el-row class="line-display">
+            <el-col :span="22" :offset="1">
+                <div class="grid-content" style="margin-top:0px; border:0">
+                    <!-- 操作 -->
+                    <ul class="btn-edit fr">
+                        <li >
+                            <el-button type="primary" @click="dialogCreateVisible = true"> <i class="el-icon-plus iconss" ></i>新增任务</el-button>
+                            <el-button type="danger" icon="delete" :disabled="selected.length==0" @click="removeUsers()"  >删除</el-button>
+                        </li>
+                    </ul>
 
-        <el-main>
-            <div id="user"> 
-                <h1>TODO</h1>
-                <el-row class="line-display">
-                    <el-col :span="22" :offset="1">
-                        <div class="grid-content" style="margin-top:0px; border:0">
-                            <!-- 操作 -->
-                            <ul class="btn-edit fr">
-                                <li >
-                                    <el-button type="primary" @click="dialogCreateVisible = true"> <i class="el-icon-plus iconss" ></i>新增任务</el-button>
-                                    <el-button type="danger" icon="delete" :disabled="selected.length==0" @click="removeUsers()"  >删除</el-button>
-                                </li>
-                            </ul>
+                    <!-- 用户列表-->
+                    <el-col :span="24" style="height:20px;"></el-col>
+                    <el-table :data="users"                            
+                            height="640"
+                            @selection-change="tableSelectionChange" >
+                        <el-table-column type="selection"
+                                        width="100">
+                        </el-table-column>
+                        <el-table-column prop="id"
+                                        label="任务ID"
+                                        width="120">
+                                        <!-- type="index" -->
+                        </el-table-column>
+                        <el-table-column prop="title"
+                                        label="任务说明"
+                                        width="280">
+                            <template slot-scope="scope">
+                                <el-popover trigger="hover" placement="top">
+                                <p>任务说明: {{ scope.row.title }}</p>
+                                <p>任务详情: {{ scope.row.description }}</p>
+                                <div slot="reference" class="name-wrapper">
+                                    <el-tag effect="plain">{{ scope.row.title }}</el-tag>
+                                </div>
+                                </el-popover>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="performer"
+                                        label="负责人"
+                                        width="178">
+                        </el-table-column>                        
+                        <el-table-column prop="endtime"
+                                        label="截止日期"
+                                        width="240">
+                        </el-table-column>                       
+                        <el-table-column prop="state"
+                                        label="完成状态"
+                                        width="160">
+                                        <!-- <template slot-scope="scope">
+                                            <el-tag
+                                            :type="scope.row.state === '已完成' ? 'primary' : 'success'"
+                                            disable-transitions>{{scope.row.stete}}</el-tag>
+                                        </template> -->
+                        </el-table-column>
+                        <el-table-column
+                            inline-template
+                            label="操作"
+                            width="194">
+                            <span>
+                                <el-button type="danger" size="small" @click="removeUser(row)">删除</el-button>
+                                <el-button type="success" size="small" @click="setCurrent(row)">编辑</el-button>
+                            </span>
+                        </el-table-column>
+                    </el-table>
+                    <div style="width:100%; ovflow:hidden; height:180px;"></div>
+                </div>
+            </el-col>
+        </el-row>
 
-                            <!-- 用户列表-->
-                            <el-col :span="24" style="height:20px;"></el-col>
-                            <el-table :data="users"                            
-                                    height="600"
-                                    @selection-change="tableSelectionChange" >
-                                <el-table-column type="selection"
-                                                width="100">
-                                </el-table-column>
-                                <el-table-column prop="id"
-                                                label="任务ID"
-                                                width="120">
-                                </el-table-column>
-                                <el-table-column prop="title"
-                                                label="任务说明"
-                                                width="280">
-                                </el-table-column>
-                                <el-table-column prop="performer"
-                                                label="负责人"
-                                                width="178">
-                                </el-table-column>                        
-                                <el-table-column prop="endtime"
-                                                label="截止日期"
-                                                width="240">
-                                </el-table-column>                       
-                                <el-table-column prop="state"
-                                                label="完成状态"
-                                                width="160">
-                                                <!-- <template slot-scope="scope">
-                                                    <el-tag
-                                                    :type="scope.row.state === '家' ? 'primary' : 'success'"
-                                                    disable-transitions>{{scope.row.stete}}</el-tag>
-                                                </template> -->
-                                </el-table-column>
-                                <el-table-column
-                                    inline-template
-                                    label="操作"
-                                    width="210">
-                                    <span>
-                                        <el-button type="danger" size="small" @click="removeUser(row)">删除</el-button>
-                                        <el-button type="success" size="small" @click="setCurrent(row)">编辑</el-button>
-                                    </span>
-                                </el-table-column>
-                            </el-table>
-                            <div style="width:100%; ovflow:hidden; height:180px;"></div>
-                        </div>
-                    </el-col>
-                </el-row>
-
-                <!-- 新建任务 begin-->
-                <el-dialog title="新建任务" v-model="dialogCreateVisible" :close-on-click-modal="false" :close-on-press-escape="false" @close="reset" >
-                    <el-form id="#create" :model="create" :rules="rules" ref="create" label-width="100px">
-                        <el-form-item label="负责人" prop="performer">
-                            <el-input v-model="create.performer"></el-input>
-                        </el-form-item>
-                        <el-form-item label="任务说明" prop="title">
-                            <el-input v-model="create.title"></el-input>
-                        </el-form-item>
-                        <el-form-item label="任务详情" prop="description">
-                            <el-input type="textarea" v-model="create.description"></el-input>
-                        </el-form-item>
-                        <el-form-item label="开始日期">
-                            <el-date-picker v-model="create.begintime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
-                            </el-date-picker>
-                        </el-form-item>
-                        <el-form-item label="截止日期">
-                            <el-date-picker v-model="create.endtime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
-                            </el-date-picker>
-                        </el-form-item>
-                        <!-- <el-form-item label="完成">
-                            <el-switch on-text="" off-text="" v-model="create.state"></el-switch>
-                        </el-form-item> -->
-                        <el-form-item label="是否完成" prop="state">
-                            <el-select v-model="create.state" placeholder="请选择完成情况">
-                                <el-option label="未完成" value="未完成"></el-option>
-                                <el-option label="已完成" value="已完成"></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </el-form>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button @click="dialogCreateVisible = false">取 消</el-button>
-                        <el-button type="primary" :loading="createLoading" @click="createUser">确 定</el-button>
-                    </div>
-                </el-dialog>
-                <!-- 修改用户 begin-->
-                <el-dialog title="修改用户信息" v-model="dialogUpdateVisible"  :close-on-click-modal="false" :close-on-press-escape="false">
-                    <el-form id="#update" :model="update" :rules="updateRules" ref="update" label-width="100px">
-                        <!-- <el-form-item label="任务ID" prop="id">
-                            <el-input v-model="update.id"></el-input>
-                        </el-form-item> -->
-                        <el-form-item label="负责人" prop="performer">
-                            <el-input v-model="update.performer"></el-input>
-                        </el-form-item>
-                        <el-form-item label="任务说明" prop="title">
-                            <el-input v-model="update.title"></el-input>
-                        </el-form-item>
-                        <el-form-item label="任务详情" prop="description">
-                            <el-input type="textarea" v-model="update.description"></el-input>
-                        </el-form-item>
-                        <el-form-item label="开始日期">
-                            <el-date-picker v-model="update.begintime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
-                            </el-date-picker>
-                        </el-form-item>
-                        <el-form-item label="截止日期">
-                            <el-date-picker v-model="update.endtime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
-                            </el-date-picker>
-                        </el-form-item>
-                        <!-- <el-form-item label="是否完成">
-                            <el-switch on-text="" off-text="" v-model="update.state"></el-switch>
-                        </el-form-item> -->
-                        <el-form-item label="是否完成">
-                            <el-select v-model="update.state" prop="state">
-                                <el-option label="已完成" value="已完成"></el-option>
-                                <el-option label="未完成" value="未完成"></el-option>
-                            </el-select>
-                        </el-form-item> 
-                    </el-form>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button @click="dialogUpdateVisible = false">取 消</el-button>
-                        <el-button type="primary" :loading="updateLoading" @click="updateUser">确 定</el-button>
-                    </div>
-                </el-dialog>
+        <!-- 新建任务 begin-->
+        <el-dialog title="新建任务" v-model="dialogCreateVisible" :close-on-click-modal="false" :close-on-press-escape="false" @close="reset" >
+            <el-form id="#create" :model="create" :rules="rules" ref="create" label-width="100px">
+                <el-form-item label="负责人" prop="performer">
+                    <el-input v-model="create.performer"></el-input>
+                </el-form-item>
+                <el-form-item label="任务说明" prop="title">
+                    <el-input v-model="create.title"></el-input>
+                </el-form-item>
+                <el-form-item label="任务详情" prop="description">
+                    <el-input type="textarea" v-model="create.description"></el-input>
+                </el-form-item>
+                <el-form-item label="开始日期">
+                    <el-date-picker v-model="create.begintime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="截止日期">
+                    <el-date-picker v-model="create.endtime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <!-- <el-form-item label="完成">
+                    <el-switch on-text="" off-text="" v-model="create.state"></el-switch>
+                </el-form-item> -->
+                <el-form-item label="是否完成" prop="state">
+                    <el-select v-model="create.state" placeholder="请选择完成情况">
+                        <el-option label="未完成" value="未完成"></el-option>
+                        <el-option label="已完成" value="已完成"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogCreateVisible = false">取 消</el-button>
+                <el-button type="primary" @click="createUser">确 定</el-button>
             </div>
-        </el-main>
-    </el-container>
+        </el-dialog>
+        <!-- 修改用户 begin-->
+        <el-dialog title="修改用户信息" v-model="dialogUpdateVisible"  :close-on-click-modal="false" :close-on-press-escape="false">
+            <el-form id="#update" :model="update" :rules="updateRules" ref="update" label-width="100px">
+                <!-- <el-form-item label="任务ID" prop="id">
+                    <el-input v-model="update.id"></el-input>
+                </el-form-item> -->
+                <el-form-item label="负责人" prop="performer">
+                    <el-input v-model="update.performer"></el-input>
+                </el-form-item>
+                <el-form-item label="任务说明" prop="title">
+                    <el-input v-model="update.title"></el-input>
+                </el-form-item>
+                <el-form-item label="任务详情" prop="description">
+                    <el-input type="textarea" v-model="update.description"></el-input>
+                </el-form-item>
+                <el-form-item label="开始日期">
+                    <el-date-picker v-model="update.begintime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="截止日期">
+                    <el-date-picker v-model="update.endtime" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <!-- <el-form-item label="是否完成">
+                    <el-switch on-text="" off-text="" v-model="update.state"></el-switch>
+                </el-form-item> -->
+                <el-form-item label="是否完成">
+                    <el-select v-model="update.state" prop="state">
+                        <el-option label="已完成" value="已完成"></el-option>
+                        <el-option label="未完成" value="未完成"></el-option>
+                    </el-select>
+                </el-form-item> 
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogUpdateVisible = false">取 消</el-button>
+                <el-button type="primary"  @click="updateUser">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
 </template>
 
 <script>
@@ -304,7 +298,7 @@
                         api._post(this.create).then(res => {
                             this.$message.success('创建任务成功！');
                             this.dialogCreateVisible = false;
-                            this.createLoading = false;
+                            // this.createLoading = false;
                             this.reset();
                             this.getUsers();
                         }).catch((res) => {
@@ -314,7 +308,7 @@
                             } else if (data instanceof Object) {
                               this.$message.error(data["message"]);
                             }
-                            this.createLoading = false;
+                            // this.createLoading = false;
                         });
                     } else {
                       //this.$message.error('存在输入校验错误!');
@@ -338,7 +332,7 @@
                             } else if (data instanceof Object) {
                                 this.$message.error(data["message"]);
                             }
-                            this.updateLoading = false;
+                            // this.updateLoading = false;
                           });
                     } else {
                         return false;
@@ -365,10 +359,16 @@
 
              //删除多个任务
             removeUsers() {
+                var ids = [];
+                $.each(this.selected, (i, user) => {
+                    ids.push(user.id);
+                });
+                ids = ids.join(",");
+
                 this.$confirm('此操作将永久删除 ' + this.selected.length + ' 个任务, 是否继续?', '提示', {
                     type: 'warning'
                 }).then(() => {
-                    api._removes().then(res =>{
+                    api._removes(ids).then(res =>{
                         this.$message.success('删除了' + this.selected.length + '个任务!');
                         this.getUsers();
                     }).catch((res) => {
@@ -388,4 +388,16 @@ ul li{list-style: none}
 .fl{float:left;}
 .fr{float:right;margin-top: 0px}
 h1{text-align: center; margin-bottom: 0px }
+.el-tag {
+    background-color: #9896f1;
+    padding: 0 5px;
+    height: 24px;
+    line-height: 22px;
+    font-size: 12px;
+    color: #fff;
+    border-radius: 4px;
+    box-sizing: border-box;
+    border: none;
+    /* border: 1px solid transparent; */
+}
 </style>

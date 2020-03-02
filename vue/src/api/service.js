@@ -102,13 +102,8 @@ export default {
     },
 
     //批量删除
-    _removes(){
-        var ids = [];
-        $.each(this.selected, (i, user) => {
-            ids.push(user.id);
-        });
-        ids = ids.join(",");
-        return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+ids);
+    _removes(param){
+        return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+param);
     },
 }
 

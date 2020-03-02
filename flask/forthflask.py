@@ -49,10 +49,10 @@ def update(id):
 @app.route('/rest/anon/tasks/<string:id>', methods=['DELETE'])
 def delete(id):
     cur = conn.cursor()
-    # cur.execute("DELETE from tasktwo where id=%s", id)
     cur.execute("DELETE from taskthree where id="+ id)
     conn.commit() 
     return "1"
+
 
 if __name__ == '__main__':
     app.run()
