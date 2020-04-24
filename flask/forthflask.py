@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)
 
 conn = psycopg2.connect(
-        database="postgres", user="postgres", password="tongji2020", host="47.111.234.116", port="5432")
+        database="postgres", user="postgres", password="*****", host="*****", port="5432")
 
 
 @app.route('/rest/anon/tasks',methods=['POST'])
