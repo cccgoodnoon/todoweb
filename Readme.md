@@ -1,1 +1,1 @@
-![add image](https://github.com/cccgoodnoon/todoweb/master/image/view.png)
+![add image](https://github.com/cccgoodnoon/todoweb/raw/master/image/view.png)
